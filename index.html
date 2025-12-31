@@ -97,6 +97,16 @@
   filter: drop-shadow(0 0 10px orange);
 }
 
+.bottom-left {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  width: 120px;
+  height: auto;
+  z-index: 10;
+}
+
+
 @keyframes float {
   0% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
@@ -109,6 +119,31 @@
   100% { filter: drop-shadow(0 0 5px orange); }
 }
         }
+
+	#nye-countdown {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 3.5em;
+  color: gold;
+  font-weight: bold;
+  text-shadow: 3px 3px 8px black;
+  z-index: 50;
+}
+
+#fireworks-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  display: none;
+  z-index: 100;
+}
+
+
 
     </style>
 </head>
@@ -145,6 +180,9 @@
     <audio id="buzzer" src="buzzer.mp3" preload="auto"></audio>
 
 	<img src="avatar.png" alt="Game Master Red" class="avatar">
+
+	<img src="ttt.png" alt="TTT Logo" class="bottom-left">
+
 
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -237,6 +275,113 @@
             }, 1000);
         }
     </script>
+
+	<div id="nye-countdown"></div>
+	<canvas id="fireworks-canvas"></canvas>
+	<audio id="nye-song" src="auld_lang_syne.mp3"></audio>
+
+<script>
+// --- NEW YEAR'S COUNTDOWN ---
+function updateNYECountdown() {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const target = new Date(`January 1, ${currentYear + 1} 00:00:00`);
+    const diff = target - now;
+
+    const countdownEl = document.getElementById("nye-countdown");
+
+    if (diff <= 0) {
+        countdownEl.textContent = "🎉 HAPPY NEW YEAR! 🎉";
+        startFireworks();
+        playNYESong();
+        return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    countdownEl.textContent =
+        `${days}d ${hours}h ${minutes}m ${seconds}s`;
+}
+
+setInterval(updateNYECountdown, 1000);
+updateNYECountdown();
+
+
+// --- FIREWORKS ENGINE ---
+const canvas = document.getElementById("fireworks-canvas");
+const ctx = canvas.getContext("2d");
+
+function startFireworks() {
+    canvas.style.display = "block";
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = [];
+
+    function spawnFirework() {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height * 0.5;
+        const colors = ["red", "gold", "white", "orange", "cyan"];
+
+        for (let i = 0; i < 60; i++) {
+            particles.push({
+                x,
+                y,
+                angle: Math.random() * Math.PI * 2,
+                speed: Math.random() * 4 + 2,
+                radius: 2,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                life: 60
+            });
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach((p, i) => {
+            p.x += Math.cos(p.angle) * p.speed;
+            p.y += Math.sin(p.angle) * p.speed;
+            p.life--;
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+
+            if (p.life <= 0) particles.splice(i, 1);
+        });
+
+        requestAnimationFrame(animate);
+    }
+
+    // Launch fireworks every 700ms
+    const fireworkInterval = setInterval(spawnFirework, 700);
+
+    animate();
+
+    // Stop fireworks after song ends
+    const song = document.getElementById("nye-song");
+    song.onended = () => {
+        clearInterval(fireworkInterval);
+        canvas.style.display = "none";
+        document.getElementById("nye-countdown").textContent = "";
+    };
+}
+
+
+// --- PLAY AULD LANG SYNE ---
+function playNYESong() {
+    const song = document.getElementById("nye-song");
+    song.currentTime = 0;
+    song.play();
+}
+</script>
+
+
 
 </body>
 </html>
