@@ -4,77 +4,282 @@
     <meta charset="UTF-8">
     <title>NYE Scoreboard with Timer</title>
     <style>
-        body { margin: 0; font-family: Arial, sans-serif; background: #0b0b0b; color: white; text-align: center; position: relative; }
-        h1 { font-size: 3em; margin-top: 20px; color: gold; text-shadow: 2px 2px 4px #000; }
-        .scoreboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; max-width: 1000px; margin: 40px auto; }
-        .team { background: rgba(255,255,255,0.05); border: 2px solid gold; border-radius: 15px; padding: 20px; box-shadow: 0 0 15px gold; }
-        .team-name { width: 80%; text-align: center; font-size: 1.5em; font-weight: bold; background: transparent; border: none; color: #FFD700; margin-bottom: 10px; outline: none; }
-        .team-name:focus { border-bottom: 2px solid gold; }
-        .score { font-size: 3em; margin: 10px 0; }
-        .buttons { display: flex; justify-content: center; gap: 20px; }
-        button { font-size: 1.5em; padding: 10px 20px; border: none; border-radius: 10px; background-color: gold; color: black; cursor: pointer; transition: background-color 0.3s; }
-        button:hover { background-color: #ffcc00; }
-        #reset { margin-top: 40px; font-size: 1.8em; padding: 15px 40px; background-color: crimson; color: white; border-radius: 12px; }
-        #reset:hover { background-color: #ff4d4d; }
-        .avatar { position: fixed; bottom: 10px; right: 10px; width: 100px; height: auto; z-index: 10; }
-        #timer { font-size: 4em; color: gold; margin-top: 20px; }
-        .timer-buttons { margin-top: 20px; }
-        #stop-message { display: none; position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 6em; color: red; font-weight: bold; z-index: 100; animation: flash 0.8s infinite; }
-        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b0b0b;
+            color: white;
+            text-align: center;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-top: 20px;
+            color: gold;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        /* TOP ICON TIMER BAR */
+        .timer-bar {
+            display: flex;
+            justify-content: space-around;
+            margin: 10px 0 20px 0;
+            font-size: 2.5em;
+        }
+
+        .timer-icon {
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.2s;
+        }
+
+        .timer-icon:hover {
+            transform: scale(1.2);
+        }
+
+        /* FLOATING COUNTDOWN */
+        #floating-timer {
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8em;
+            color: gold;
+            font-weight: bold;
+            display: none;
+            animation: pulse 1s infinite;
+            z-index: 200;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.25); opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        /* FLASHING STOP */
+        #stop-message {
+            display: none;
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 7em;
+            color: red;
+            font-weight: bold;
+            z-index: 300;
+            animation: flash 0.8s infinite;
+        }
+
+        @keyframes flash {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* SCOREBOARD GRID */
+        .scoreboard {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 1000px;
+            margin: 20px auto;
+        }
+
+        .team {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid gold;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 15px gold;
+        }
+
+        .team-name {
+            width: 80%;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            background: transparent;
+            border: none;
+            color: #FFD700;
+            margin-bottom: 10px;
+            outline: none;
+        }
+
+        .team-name:focus {
+            border-bottom: 2px solid gold;
+        }
+
+        .score {
+            font-size: 3em;
+            margin: 10px 0;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        button {
+            font-size: 1.5em;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            background-color: gold;
+            color: black;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #ffcc00;
+        }
+
+        #reset {
+            margin-top: 40px;
+            font-size: 1.8em;
+            padding: 15px 40px;
+            background-color: crimson;
+            color: white;
+            border-radius: 12px;
+        }
+
+        #reset:hover {
+            background-color: #ff4d4d;
+        }
+
+        .avatar {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 100px;
+            height: auto;
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
+
     <h1>🎉 New Year's Eve Scoreboard 🎉</h1>
-    <div id="timer"></div>
-    <div class="timer-buttons">
-        <button onclick="startCountdown(30)">30 Second Timer</button>
-        <button onclick="startCountdown(60)">60 Second Timer</button>
+
+    <!-- FULL-WIDTH ICON TIMER BAR -->
+    <div class="timer-bar">
+        <div class="timer-icon" onclick="startCountdown(15)">🕒15</div>
+        <div class="timer-icon" onclick="startCountdown(30)">🕒30</div>
+        <div class="timer-icon" onclick="startCountdown(60)">🕒60</div>
     </div>
-    <div class="scoreboard">
-        <div class="team"> <input class="team-name" id="name1" value="Team 1"> <div class="score" id="score1">0</div> <div class="buttons"> <button onclick="changeScore(1,1)">+</button> <button onclick="changeScore(1,-1)">−</button> </div> </div>
-        <div class="team"> <input class="team-name" id="name2" value="Team 2"> <div class="score" id="score2">0</div> <div class="buttons"> <button onclick="changeScore(2,1)">+</button> <button onclick="changeScore(2,-1)">−</button> </div> </div>
-        <div class="team"> <input class="team-name" id="name3" value="Team 3"> <div class="score" id="score3">0</div> <div class="buttons"> <button onclick="changeScore(3,1)">+</button> <button onclick="changeScore(3,-1)">−</button> </div> </div>
-        <div class="team"> <input class="team-name" id="name4" value="Team 4"> <div class="score" id="score4">0</div> <div class="buttons"> <button onclick="changeScore(4,1)">+</button> <button onclick="changeScore(4,-1)">−</button> </div> </div>
-    </div>
-    <button id="reset" onclick="resetScores()">Reset All Scores</button>
+
+    <!-- FLOATING COUNTDOWN -->
+    <div id="floating-timer"></div>
+
+    <!-- FLASHING STOP -->
     <div id="stop-message">STOP</div>
+
+    <!-- SCOREBOARD -->
+    <div class="scoreboard">
+        <div class="team">
+            <input class="team-name" id="name1" value="Team 1">
+            <div class="score" id="score1">0</div>
+            <div class="buttons">
+                <button onclick="changeScore(1,1)">+</button>
+                <button onclick="changeScore(1,-1)">−</button>
+            </div>
+        </div>
+
+        <div class="team">
+            <input class="team-name" id="name2" value="Team 2">
+            <div class="score" id="score2">0</div>
+            <div class="buttons">
+                <button onclick="changeScore(2,1)">+</button>
+                <button onclick="changeScore(2,-1)">−</button>
+            </div>
+        </div>
+
+        <div class="team">
+            <input class="team-name" id="name3" value="Team 3">
+            <div class="score" id="score3">0</div>
+            <div class="buttons">
+                <button onclick="changeScore(3,1)">+</button>
+                <button onclick="changeScore(3,-1)">−</button>
+            </div>
+        </div>
+
+        <div class="team">
+            <input class="team-name" id="name4" value="Team 4">
+            <div class="score" id="score4">0</div>
+            <div class="buttons">
+                <button onclick="changeScore(4,1)">+</button>
+                <button onclick="changeScore(4,-1)">−</button>
+            </div>
+        </div>
+    </div>
+
+    <button id="reset" onclick="resetScores()">Reset All Scores</button>
+
+    <!-- AUDIO FILES -->
+    <audio id="beep" src="beep.mp3" preload="auto"></audio>
     <audio id="buzzer" src="buzzer.mp3" preload="auto"></audio>
+
     <img src="avatar.png" alt="Game Master Red" class="avatar">
 
     <script>
         function changeScore(team, delta) {
-            const scoreEl = document.getElementById('score'+team);
+            const scoreEl = document.getElementById('score' + team);
             let score = parseInt(scoreEl.textContent);
             score = Math.max(0, score + delta);
             scoreEl.textContent = score;
         }
+
         function resetScores() {
-            for (let i=1;i<=4;i++) {
-                document.getElementById('score'+i).textContent = 0;
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById('score' + i).textContent = 0;
             }
         }
+
         let countdownInterval;
+
         function startCountdown(seconds) {
             clearInterval(countdownInterval);
-            const timerEl=document.getElementById('timer');
-            const stopMsg=document.getElementById('stop-message');
-            let timeLeft=seconds;
-            timerEl.textContent=timeLeft+"s";
-            countdownInterval=setInterval(()=>{
+
+            const floatTimer = document.getElementById('floating-timer');
+            const stopMsg = document.getElementById('stop-message');
+            const beep = document.getElementById('beep');
+            const buzzer = document.getElementById('buzzer');
+
+            let timeLeft = seconds;
+
+            floatTimer.textContent = timeLeft;
+            floatTimer.style.display = 'block';
+            stopMsg.style.display = 'none';
+
+            countdownInterval = setInterval(() => {
                 timeLeft--;
-                if(timeLeft>0){
-                    timerEl.textContent=timeLeft+"s";
+
+                if (timeLeft > 0) {
+                    floatTimer.textContent = timeLeft;
+
+                    if (timeLeft <= 3) {
+                        beep.currentTime = 0;
+                        beep.play();
+                    }
+
                 } else {
                     clearInterval(countdownInterval);
-                    timerEl.textContent="";
-                    document.getElementById('buzzer').play();
-                    stopMsg.style.display='block';
-                    setTimeout(()=>{
-                        stopMsg.style.display='none';
-                    },5000);
+                    floatTimer.style.display = 'none';
+
+                    buzzer.currentTime = 0;
+                    buzzer.play();
+                    stopMsg.style.display = 'block';
+
+                    setTimeout(() => {
+                        stopMsg.style.display = 'none';
+                    }, 5000);
                 }
-            },1000);
+            }, 1000);
         }
     </script>
+
 </body>
 </html>
