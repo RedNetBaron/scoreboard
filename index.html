@@ -20,22 +20,88 @@
             text-shadow: 2px 2px 4px #000;
         }
 
-        /* TOP ICON TIMER BAR */
-        .timer-bar {
+        /* SCOREBOARD GRID (reduced size by ~10%) */
+        .scoreboard {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            max-width: 900px;
+            margin: 20px auto;
+            transform: scale(0.9);
+        }
+
+        .team {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid gold;
+            border-radius: 15px;
+            padding: 18px;
+            box-shadow: 0 0 12px gold;
+        }
+
+        .team-name {
+            width: 80%;
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: bold;
+            background: transparent;
+            border: none;
+            color: #FFD700;
+            margin-bottom: 8px;
+            outline: none;
+        }
+
+        .team-name:focus {
+            border-bottom: 2px solid gold;
+        }
+
+        .score {
+            font-size: 2.7em;
+            margin: 8px 0;
+        }
+
+        .buttons {
             display: flex;
-            justify-content: space-around;
-            margin: 10px 0 20px 0;
-            font-size: 2.5em;
+            justify-content: center;
+            gap: 18px;
         }
 
-        .timer-icon {
+        button {
+            font-size: 1.4em;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            background-color: gold;
+            color: black;
             cursor: pointer;
-            user-select: none;
-            transition: transform 0.2s;
+            transition: background-color 0.3s;
         }
 
-        .timer-icon:hover {
-            transform: scale(1.2);
+        button:hover {
+            background-color: #ffcc00;
+        }
+
+        #reset {
+            margin-top: 20px;
+            font-size: 1.6em;
+            padding: 12px 35px;
+            background-color: crimson;
+            color: white;
+            border-radius: 12px;
+        }
+
+        #reset:hover {
+            background-color: #ff4d4d;
+        }
+
+        /* TIMER BUTTONS BELOW GRID */
+        .timer-buttons {
+            margin-top: 25px;
+        }
+
+        .timer-buttons button {
+            font-size: 1.8em;
+            padding: 12px 30px;
+            margin: 0 10px;
         }
 
         /* FLOATING COUNTDOWN */
@@ -78,78 +144,6 @@
             100% { opacity: 1; }
         }
 
-        /* SCOREBOARD GRID */
-        .scoreboard {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-            max-width: 1000px;
-            margin: 20px auto;
-        }
-
-        .team {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid gold;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 0 15px gold;
-        }
-
-        .team-name {
-            width: 80%;
-            text-align: center;
-            font-size: 1.5em;
-            font-weight: bold;
-            background: transparent;
-            border: none;
-            color: #FFD700;
-            margin-bottom: 10px;
-            outline: none;
-        }
-
-        .team-name:focus {
-            border-bottom: 2px solid gold;
-        }
-
-        .score {
-            font-size: 3em;
-            margin: 10px 0;
-        }
-
-        .buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        button {
-            font-size: 1.5em;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            background-color: gold;
-            color: black;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #ffcc00;
-        }
-
-        #reset {
-            margin-top: 40px;
-            font-size: 1.8em;
-            padding: 15px 40px;
-            background-color: crimson;
-            color: white;
-            border-radius: 12px;
-        }
-
-        #reset:hover {
-            background-color: #ff4d4d;
-        }
-
         .avatar {
             position: fixed;
             bottom: 10px;
@@ -163,13 +157,6 @@
 <body>
 
     <h1>🎉 New Year's Eve Scoreboard 🎉</h1>
-
-    <!-- FULL-WIDTH ICON TIMER BAR -->
-    <div class="timer-bar">
-        <div class="timer-icon" onclick="startCountdown(15)">🕒15</div>
-        <div class="timer-icon" onclick="startCountdown(30)">🕒30</div>
-        <div class="timer-icon" onclick="startCountdown(60)">🕒60</div>
-    </div>
 
     <!-- FLOATING COUNTDOWN -->
     <div id="floating-timer"></div>
@@ -216,9 +203,16 @@
         </div>
     </div>
 
+    <!-- TIMER BUTTONS BELOW GRID -->
+    <div class="timer-buttons">
+        <button onclick="startCountdown(15)">15 Second Timer</button>
+        <button onclick="startCountdown(30)">30 Second Timer</button>
+        <button onclick="startCountdown(60)">60 Second Timer</button>
+    </div>
+
     <button id="reset" onclick="resetScores()">Reset All Scores</button>
 
-    <!-- AUDIO FILES -->
+    <!-- AUDIO -->
     <audio id="beep" src="beep.mp3" preload="auto"></audio>
     <audio id="buzzer" src="buzzer.mp3" preload="auto"></audio>
 
@@ -227,7 +221,8 @@
     <script>
         function changeScore(team, delta) {
             const scoreEl = document.getElementById('score' + team);
-            let score = parseInt(scoreEl.textContent);
+            let score = parseInt(scoreEl.textContent, 10);
+            if (isNaN(score)) score = 0;
             score = Math.max(0, score + delta);
             scoreEl.textContent = score;
         }
@@ -238,7 +233,7 @@
             }
         }
 
-        let countdownInterval;
+        let countdownInterval = null;
 
         function startCountdown(seconds) {
             clearInterval(countdownInterval);
