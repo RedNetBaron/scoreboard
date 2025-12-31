@@ -119,27 +119,28 @@
 }
         }
 
-#nye-countdown {
+#nye-wrapper #nye-countdown {
   position: fixed;
   bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
-  display: block !important;
-  width: 100% !important;
-  text-align: center !important;
 
-  font-size: 140px !important;   /* FIRE TV LOVES PX, NOT EM */
-  line-height: 1.1;
-  color: gold;
+  font-size: 160px !important;
   font-weight: 900;
+  color: gold;
 
   text-shadow: 4px 4px 12px black;
-  z-index: 9999;
+  z-index: 99999;
   pointer-events: none;
+
+  display: block;
+  width: 100%;
+  text-align: center;
 
   -webkit-text-size-adjust: none !important;
   text-size-adjust: none !important;
 }
+
 
 #fireworks-canvas {
   position: fixed;
@@ -192,7 +193,8 @@
 
 	<img src="TTT.png" alt="TTT Logo" class="bottom-left">
 
-
+<div id="nye-wrapper"> <div id="nye-countdown"></div> </div>
+	
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -394,6 +396,7 @@ function playNYESong() {
 
 </body>
 </html>
+
 
 
 
