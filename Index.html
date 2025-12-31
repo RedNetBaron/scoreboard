@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NYE Scoreboard</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b0b0b;
+            color: white;
+            text-align: center;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-top: 20px;
+            color: gold;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        .scoreboard {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            max-width: 900px;
+            margin: 20px auto;
+            transform: scale(0.9);
+        }
+
+        .team {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid gold;
+            border-radius: 15px;
+            padding: 18px;
+            box-shadow: 0 0 12px gold;
+        }
+
+        .team-name {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 8px;
+        }
+
+        .score {
+            font-size: 2.7em;
+            margin: 8px 0;
+        }
+
+        #floating-timer {
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8em;
+            color: gold;
+            font-weight: bold;
+            display: none;
+            animation: pulse 1s infinite;
+            z-index: 200;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.25); opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        #stop-message {
+            display: none;
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 7em;
+            color: red;
+            font-weight: bold;
+            z-index: 300;
+            animation: flash 0.8s infinite;
+        }
+
+        @keyframes flash {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎉 New Year's Eve Scoreboard 🎉</h1>
+
+    <div id="floating-timer"></div>
+    <div id="stop-message">STOP</div>
+
+    <div class="scoreboard">
+        <div class="team">
+            <div class="team-name" id="name1">Team 1</div>
+            <div class="score" id="score1">0</div>
+        </div>
+
+        <div class="team">
+            <div class="team-name" id="name2">Team 2</div>
+            <div class="score" id="score2">0</div>
+        </div>
+
+        <div class="team">
+            <div class="team-name" id="name3">Team 3</div>
+            <div class="score" id="score3">0</div>
+        </div>
+
+        <div class="team">
+            <div class="team-name" id="name4">Team 4</div>
+            <div class="score" id="score4">0</div>
+        </div>
+    </div>
+
+    <audio id="beep" src="beep.mp3" preload="auto"></audio>
+    <audio id="buzzer" src="buzzer.mp3" preload="auto"></audio>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDCHmQ3zQEBJk-e_vjsq01Eds0_YAi3Xbw",
+            authDomain: "nyescoreboard.firebaseapp.com",
+            databaseURL: "https://nyescoreboard-default-rtdb.firebaseio.com",
+            projectId: "nyescoreboard",
+            storageBucket: "nyescoreboard.firebasestorage.app",
+            messagingSenderId: "400500109720",
+            appId: "1:400500109720:web:2205e242a2e9e1519e3bed",
+            measurementId: "G-F02TL3ZXTF"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // SCORE LISTENERS
+        for (let i = 1; i <= 4; i++) {
+            db.ref("scores/score" + i).on("value", snap => {
+                document.getElementById("score" + i).textContent = snap.val() ?? 0;
+            });
+        }
+
+        // TEAM NAME LISTENERS
+        for (let i = 1; i <= 4; i++) {
+            db.ref("names/name" + i).on("value", snap => {
+                if (snap.exists()) {
+                    document.getElementById("name" + i).textContent = snap.val();
+                }
+            });
+        }
+
+        // TIMER LISTENER
+        let countdownInterval = null;
+
+        db.ref("timer").on("value", snap => {
+            const seconds = snap.val();
+
+            if (seconds === null) {
+                clearInterval(countdownInterval);
+                document.getElementById("floating-timer").style.display = "none";
+                document.getElementById("stop-message").style.display = "none";
+                return;
+            }
+
+            startCountdown(seconds);
+        });
+
+        function startCountdown(seconds) {
+            clearInterval(countdownInterval);
+
+            const floatTimer = document.getElementById("floating-timer");
+            const stopMsg = document.getElementById("stop-message");
+            const beep = document.getElementById("beep");
+            const buzzer = document.getElementById("buzzer");
+
+            let timeLeft = seconds;
+
+            floatTimer.textContent = timeLeft;
+            floatTimer.style.display = "block";
+            stopMsg.style.display = "none";
+
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+
+                if (timeLeft > 0) {
+                    floatTimer.textContent = timeLeft;
+
+                    if (timeLeft <= 3) {
+                        beep.currentTime = 0;
+                        beep.play();
+                    }
+
+                } else {
+                    clearInterval(countdownInterval);
+                    floatTimer.style.display = "none";
+
+                    buzzer.currentTime = 0;
+                    buzzer.play();
+                    stopMsg.style.display = "block";
+
+                    setTimeout(() => {
+                        stopMsg.style.display = "none";
+                    }, 5000);
+                }
+            }, 1000);
+        }
+    </script>
+
+</body>
+</html>
