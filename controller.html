@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Scoreboard Controller</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: gold;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+
+    .team {
+      margin: 20px 0;
+      padding: 10px;
+      border: 2px solid gold;
+      border-radius: 10px;
+    }
+
+    .team input {
+      font-size: 1.2em;
+      padding: 5px;
+      width: 60%;
+      margin-bottom: 10px;
+      text-align: center;
+      border-radius: 5px;
+      border: none;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      font-size: 1.2em;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background-color: gold;
+      color: black;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ffcc00;
+    }
+
+    .timer-buttons {
+      margin-top: 30px;
+    }
+
+    .timer-buttons button {
+      font-size: 1.5em;
+      margin: 10px;
+      padding: 12px 25px;
+    }
+
+    #reset {
+      margin-top: 30px;
+      background-color: crimson;
+      color: white;
+    }
+
+    #reset:hover {
+      background-color: #ff4d4d;
+    }
+  </style>
+</head>
+<body>
+  <h1>📱 Scoreboard Controller</h1>
+
+  <div class="team">
+    <input id="name1" placeholder="Team 1 Name" />
+    <div class="buttons">
+      <button onclick="changeScore(1, 1)">Team 1 +</button>
+      <button onclick="changeScore(1, -1)">Team 1 −</button>
+    </div>
+  </div>
+
+  <div class="team">
+    <input id="name2" placeholder="Team 2 Name" />
+    <div class="buttons">
+      <button onclick="changeScore(2, 1)">Team 2 +</button>
+      <button onclick="changeScore(2, -1)">Team 2 −</button>
+    </div>
+  </div>
+
+  <div class="team">
+    <input id="name3" placeholder="Team 3 Name" />
+    <div class="buttons">
+      <button onclick="changeScore(3, 1)">Team 3 +</button>
+      <button onclick="changeScore(3, -1)">Team 3 −</button>
+    </div>
+  </div>
+
+  <div class="team">
+    <input id="name4" placeholder="Team 4 Name" />
+    <div class="buttons">
+      <button onclick="changeScore(4, 1)">Team 4 +</button>
+      <button onclick="changeScore(4, -1)">Team 4 −</button>
+    </div>
+  </div>
+
+  <div class="timer-buttons">
+    <button onclick="startTimer(15)">15s Timer</button>
+    <button onclick="startTimer(30)">30s Timer</button>
+    <button onclick="startTimer(60)">60s Timer</button>
+  </div>
+
+  <button id="reset" onclick="resetAll()">Reset All Scores</button>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDCHmQ3zQEBJk-e_vjsq01Eds0_YAi3Xbw",
+      authDomain: "nyescoreboard.firebaseapp.com",
+      databaseURL: "https://nyescoreboard-default-rtdb.firebaseio.com",
+      projectId: "nyescoreboard",
+      storageBucket: "nyescoreboard.firebasestorage.app",
+      messagingSenderId: "400500109720",
+      appId: "1:400500109720:web:2205e242a2e9e1519e3bed",
+      measurementId: "G-F02TL3ZXTF"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function changeScore(team, delta) {
+      const ref = db.ref("scores/score" + team);
+      ref.get().then(snapshot => {
+        let current = snapshot.val() || 0;
+        let updated = Math.max(0, current + delta);
+        ref.set(updated);
+      });
+    }
+
+    function startTimer(seconds) {
+      db.ref("timer").set(seconds);
+    }
+
+    function resetAll() {
+      for (let i = 1; i <= 4; i++) {
+        db.ref("scores/score" + i).set(0);
+      }
+      db.ref("timer").set(null);
+    }
+
+    // Team name syncing
+    for (let i = 1; i <= 4; i++) {
+      document.getElementById("name" + i).addEventListener("change", function () {
+        db.ref("names/name" + i).set(this.value);
+      });
+    }
+  </script>
+</body>
+</html>
