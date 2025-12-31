@@ -123,14 +123,15 @@
   position: fixed;
   bottom: 40px;
   left: 50%;
-  transform: translateX(-50%);
-  font-size: 8em;          /* BIGGER COUNTDOWN */
-  color: gold;8
+  transform: translateX(-50%) scale(1) !important;
+  font-size: 8em !important;
+  color: gold;
   font-weight: 900;
   text-shadow: 4px 4px 12px black;
-  z-index: 50;
-  letter-spacing: 3px;
+  z-index: 9999;
+  pointer-events: none;
 }
+
 
 
 #fireworks-canvas {
@@ -386,6 +387,7 @@ function playNYESong() {
 
 </body>
 </html>
+
 
 
 
