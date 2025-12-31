@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NYE Scoreboard</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b0b0b;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+        h1 {
+            font-size: 3em;
+            margin-top: 20px;
+            color: gold;
+            text-shadow: 2px 2px 4px #000;
+        }
+        .scoreboard {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 1000px;
+            margin: 40px auto;
+        }
+        .team {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid gold;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 15px gold;
+        }
+        .team-name {
+            width: 80%;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            background: transparent;
+            border: none;
+            color: #FFD700;
+            margin-bottom: 10px;
+            outline: none;
+        }
+        .team-name:focus {
+            border-bottom: 2px solid gold;
+        }
+        .score {
+            font-size: 3em;
+            margin: 10px 0;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        button {
+            font-size: 1.5em;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            background-color: gold;
+            color: black;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #ffcc00;
+        }
+        #reset {
+            margin-top: 40px;
+            font-size: 1.8em;
+            padding: 15px 40px;
+            background-color: crimson;
+            color: white;
+            border-radius: 12px;
+        }
+        #reset:hover {
+            background-color: #ff4d4d;
+        }
+        .avatar {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 100px;
+            height: auto;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎉 New Year's Eve Scoreboard 🎉</h1>
+    <div class="scoreboard">
+        <div class="team">
+            <input class="team-name" id="name1" value="Team 1">
+            <div class="score" id="score1">0</div>
+            <div class="buttons">
+                <button onclick="changeScore(1, 1)">+</button>
+                <button onclick="changeScore(1, -1)">−</button>
+            </div>
+        </div>
+        <div class="team">
+            <input class="team-name" id="name2" value="Team 2">
+            <div class="score" id="score2">0</div>
+            <div class="buttons">
+                <button onclick="changeScore(2, 1)">+</button>
+                <button onclick="changeScore(2, -1)">−</button>
+            </div>
+        </div>
+        <div class="team">
+            <input class="team-name" id="name3" value="Team 3">
+            <div class="score" id="score3">0</div>
+            <div class="buttons">
+                <button onclick="changeScore(3, 1)">+</button>
+                <button onclick="changeScore(3, -1)">−</button>
+            </div>
+        </div>
+        <div class="team">
+            <input class="team-name" id="name4" value="Team 4">
+            <div class="score" id="score4">0</div>
+            <div class="buttons">
+                <button onclick="changeScore(4, 1)">+</button>
+                <button onclick="changeScore(4, -1)">−</button>
+            </div>
+        </div>
+    </div>
+    <button id="reset" onclick="resetScores()">Reset All Scores</button>
+    <img src="avatar.png" alt="Game Master Red" class="avatar">
+    <script>
+        function changeScore(team, delta) {
+            const scoreEl = document.getElementById('score' + team);
+            let score = parseInt(scoreEl.textContent);
+            score = Math.max(0, score + delta);
+            scoreEl.textContent = score;
+        }
+        function resetScores() {
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById('score' + i).textContent = 0;
+            }
+        }
+    </script>
+</body>
+</html>
