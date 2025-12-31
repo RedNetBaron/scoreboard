@@ -123,16 +123,23 @@
   position: fixed;
   bottom: 40px;
   left: 50%;
-  transform: translateX(-50%) scale(1) !important;
-  font-size: 8em !important;
+  transform: translateX(-50%);
+  display: block !important;
+  width: 100% !important;
+  text-align: center !important;
+
+  font-size: 140px !important;   /* FIRE TV LOVES PX, NOT EM */
+  line-height: 1.1;
   color: gold;
   font-weight: 900;
+
   text-shadow: 4px 4px 12px black;
   z-index: 9999;
   pointer-events: none;
+
+  -webkit-text-size-adjust: none !important;
+  text-size-adjust: none !important;
 }
-
-
 
 #fireworks-canvas {
   position: fixed;
@@ -387,6 +394,7 @@ function playNYESong() {
 
 </body>
 </html>
+
 
 
 
