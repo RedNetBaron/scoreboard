@@ -388,27 +388,39 @@ function playNYESong() {
     song.currentTime = 0;
     song.play();
 }
+
+	// This "wakes up" the audio engine on the first click/tap
+    document.addEventListener('click', function() {
+        const sounds = [
+            document.getElementById("beep"),
+            document.getElementById("buzzer"),
+            document.getElementById("nye-song")
+        ];
+        
+        sounds.forEach(sound => {
+            // We play and pause immediately to "unlock" the file for the browser
+            sound.muted = true; 
+            sound.play().then(() => {
+                sound.pause();
+                sound.muted = false;
+                sound.currentTime = 0;
+            }).catch(e => console.log("Audio unlock failed:", e));
+        });
+
+        // Visual confirmation: Background flashes so you know it worked!
+        document.body.style.backgroundColor = "gold";
+        setTimeout(() => { 
+            document.body.style.backgroundColor = "#0b0b0b"; 
+        }, 200);
+
+    }, { once: true });
 </script>
 
-// This function "wakes up" the audio engine on the first tap
-document.body.addEventListener('click', function() {
-    const sounds = [
-        document.getElementById("beep"),
-        document.getElementById("buzzer"),
-        document.getElementById("nye-song")
-    ];
-    
-    sounds.forEach(sound => {
-        sound.volume = 0;
-        sound.play().then(() => {
-            sound.pause();
-            sound.volume = 1; // Reset volume to full
-        }).catch(e => console.log("Audio unlock failed:", e));
-    });
-}, { once: true }); // This ensures it only runs on the FIRST click
+
 
 </body>
 </html>
+
 
 
 
