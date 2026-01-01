@@ -235,15 +235,15 @@
         db.ref("timer").on("value", snap => {
             const seconds = snap.val();
 
-            if (seconds === null) {
-                clearInterval(countdownInterval);
-                document.getElementById("floating-timer").style.display = "none";
-                document.getElementById("stop-message").style.display = "none";
-                return;
-            }
+            if (seconds === null || seconds === 0) {
+        clearInterval(countdownInterval);
+        document.getElementById("floating-timer").style.display = "none";
+        document.getElementById("stop-message").style.display = "none";
+        return;
+    }
 
-            startCountdown(seconds);
-        });
+    startCountdown(seconds);
+});
 
         function startCountdown(seconds) {
             clearInterval(countdownInterval);
@@ -390,10 +390,26 @@ function playNYESong() {
 }
 </script>
 
-
+// This function "wakes up" the audio engine on the first tap
+document.body.addEventListener('click', function() {
+    const sounds = [
+        document.getElementById("beep"),
+        document.getElementById("buzzer"),
+        document.getElementById("nye-song")
+    ];
+    
+    sounds.forEach(sound => {
+        sound.volume = 0;
+        sound.play().then(() => {
+            sound.pause();
+            sound.volume = 1; // Reset volume to full
+        }).catch(e => console.log("Audio unlock failed:", e));
+    });
+}, { once: true }); // This ensures it only runs on the FIRST click
 
 </body>
 </html>
+
 
 
 
